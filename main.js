@@ -1,5 +1,6 @@
-const { app, BrowserWindow } = require("electron");
-let win, pixiWindow;
+import { app, BrowserWindow } from "electron";
+
+let win, a, b;
 
 function createMainWindow() {
   win = new BrowserWindow({
@@ -14,25 +15,31 @@ function createMainWindow() {
     app.emit("window-all-closed");
     win = null;
   });
+  win.show();
 }
 
 function createPixiWindow() {
-  pixiWindow = new BrowserWindow({
-    width: 64,
-    height: 64,
+  let w = new BrowserWindow({
+    width: 512,
+    height: 512,
     frame: false,
     transparent: true
   });
-  pixiWindow.setMenu(null);
-  pixiWindow.loadURL(`file://${__dirname}/src/pixi/pixi.html`);
-  pixiWindow.on("closed", () => {
-    pixiWindow = null;
-  });
+
+  w.setMenu(null);
+  w.loadURL(`file://${__dirname}/src/sprite/sprite.html`);
+  //w.webContents.openDevTools();
+  w.show();
+
+  return w;
 }
 
 app.on("ready", () => {
   createMainWindow();
-  createPixiWindow();
+  a = createPixiWindow();
+  a.on("closed", () => {
+    a = null;
+  });
 });
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
@@ -43,8 +50,5 @@ app.on("window-all-closed", () => {
 app.on("activate", () => {
   if (win === null) {
     createMainWindow();
-  }
-  if (pixiWindow === null) {
-    createPixiWindow();
   }
 });
