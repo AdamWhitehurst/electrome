@@ -2,4 +2,4 @@
 
 ### Architecture as it Stands.
 
-![Architecture Diagram](https://imgur.com/5gGOHzi)
+![Architecture Diagram](https://i.imgur.com/5gGOHzi.png)
