@@ -1,41 +1,43 @@
-import * as P from "pixi.js";
-P.settings.SCALE_MODE = P.SCALE_MODES.NEAREST;
+import { BrowserWindow } from "electron";
+import { ipcMain } from "electron";
 
 class Sprite {
-  constructor(spriteName = "green_slime", dim = 64) {
-    this.pixi = new P.Application(dim, dim, { transparent: true });
-    this.spriteName = spriteName;
-    this.initSprites();
-    document.body.appendChild(this.pixi.view);
+  constructor(spriteName) {
+    this.spriteName = spriteName || "green_slime";
+    this.renderer;
+    ipcMain.on("window-ready", (event, arg) => {
+      event.returnValue = this.spriteName;
+      this.renderer = event.sender;
+    });
+
+    this.createWindow();
   }
 
-  initSprites() {
-    P.loader.add("sprites", "../../assets/sheets/sprites.json").load(() => {
-      this.loadSprite();
+  createWindow() {
+    let w = new BrowserWindow({
+      width: 64,
+      height: 64,
+      frame: false,
+      transparent: true
+    });
+
+    w.setMenu(null);
+    w.loadURL(`file://${__dirname}/sprite_window.html`);
+    //w.setIgnoreMouseEvents(true);
+    //w.webContents.openDevTools();
+    w.show();
+    this.window = w;
+    w.on("closed", () => {
+      this.window = null;
     });
   }
-  loadSprite() {
-    let frames = [];
-    for (let i = 0; i < 10; i++) {
-      frames.push(P.utils.TextureCache[`${this.spriteName}${i}.png`]);
-    }
 
-    let as = new P.extras.AnimatedSprite(frames);
-    as.interactive = true;
-    as.on("mousedown", () => {
-      as.scale.x *= 2;
-      as.scale.y *= 2;
-    });
-    as.animationSpeed = 0.15;
-    as.anchor.set(0.5);
-    as.x = this.pixi.screen.width / 2;
-    as.y = this.pixi.screen.height / 2;
-    as.scale.x *= 2;
-    as.scale.y *= 2;
-    as.play();
-    this.sprite = as;
-    this.pixi.stage.addChild(this.sprite);
+  moveWindow(x = 0, y = 0) {
+    if (!this.window) return;
+
+    let pos = this.window.getPosition();
+    this.window.setPosition(pos[0] + x, pos[1] + y, true);
   }
 }
 
-let s = new Sprite();
+export default Sprite;

@@ -1,46 +1,33 @@
 import { app, BrowserWindow } from "electron";
+import Sprite from "./src/sprite/sprite";
 
-let win, a, b;
-
+let mainWindow;
+let spritePool = [];
 function createMainWindow() {
-  win = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600
   });
   //win.setIgnoreMouseEvents(true);
-  win.setMenu(null);
-  win.loadURL(`file://${__dirname}/src/main_window/main_window.html`);
-  win.webContents.openDevTools();
-  win.on("closed", () => {
+  mainWindow.setMenu(null);
+  mainWindow.loadURL(`file://${__dirname}/src/main_window/main_window.html`);
+  mainWindow.webContents.openDevTools();
+  mainWindow.on("closed", () => {
     app.emit("window-all-closed");
-    win = null;
+    mainWindow = null;
   });
-  win.show();
+  mainWindow.show();
 }
 
-function createPixiWindow() {
-  let w = new BrowserWindow({
-    width: 512,
-    height: 512,
-    frame: false,
-    transparent: true
-  });
-
-  w.setMenu(null);
-  w.loadURL(`file://${__dirname}/src/sprite/sprite.html`);
-  //w.webContents.openDevTools();
-  w.show();
-
-  return w;
+function createSprite() {
+  spritePool.push(new Sprite("green_slime"));
 }
 
 app.on("ready", () => {
+  createSprite();
   createMainWindow();
-  a = createPixiWindow();
-  a.on("closed", () => {
-    a = null;
-  });
 });
+
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
@@ -48,7 +35,7 @@ app.on("window-all-closed", () => {
 });
 
 app.on("activate", () => {
-  if (win === null) {
+  if (mainWindow === null) {
     createMainWindow();
   }
 });
