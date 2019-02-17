@@ -3,37 +3,45 @@ import { ipcRenderer } from "electron";
 P.settings.SCALE_MODE = P.SCALE_MODES.NEAREST;
 let dim = 64;
 let pixi = new P.Application(dim, dim, { transparent: true });
-let spriteName;
-let sprite;
+let spriteName, currSprite;
+let sprites = {};
 
-function initSprites() {
-  P.loader.add("sprites", "../../assets/sheets/sprites.json").load(() => {
-    spriteName = ipcRenderer.sendSync("window-ready");
-    loadSprite();
-  });
+function loadSpritesheet() {
+  P.loader
+    .add("green_slime", "../../assets/sheets/green_slime.json")
+    .load(() => {
+      spriteName = ipcRenderer.sendSync("window-ready");
+      onSpritesheetLoaded();
+    });
 }
+function onSpritesheetLoaded() {
+  initAnimations();
+}
+function initAnimations() {
+  let animations = P.loader.resources[spriteName].spritesheet.animations;
 
-function loadSprite() {
-  let frames = [];
-  for (let i = 0; i < 10; i++) {
-    frames.push(P.utils.TextureCache[`${spriteName}${i}.png`]);
-  }
-
-  let as = new P.extras.AnimatedSprite(frames);
-  as.interactive = true;
-  as.on("mousedown", () => {
+  for (const anim in animations) {
+    console.log(anim, animations[anim]);
+    let as = new P.extras.AnimatedSprite(animations[anim]);
+    as.interactive = true;
+    as.animationSpeed = 0.15;
+    as.x = pixi.screen.width / 2;
+    as.y = pixi.screen.height / 2;
     as.scale.x *= 2;
     as.scale.y *= 2;
-  });
-  as.animationSpeed = 0.15;
-  as.anchor.set(0.5);
-  as.x = pixi.screen.width / 2;
-  as.y = pixi.screen.height / 2;
-  as.scale.x *= 2;
-  as.scale.y *= 2;
-  as.play();
-  sprite = as;
-  pixi.stage.addChild(sprite);
+    sprites[anim] = as;
+  }
+
+  loadSprite("melt");
 }
-initSprites();
+function loadSprite(animName) {
+  if (currSprite) {
+    currSprite.stop();
+    pixi.stage.removeChild(currSprite);
+  }
+  currSprite = sprites[`${spriteName}_${animName}`];
+  currSprite.play();
+  pixi.stage.addChild(currSprite);
+}
+loadSpritesheet();
 document.body.appendChild(pixi.view);

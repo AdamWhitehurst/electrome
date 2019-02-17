@@ -15,16 +15,16 @@ class Sprite {
 
   createWindow() {
     let w = new BrowserWindow({
-      width: 64,
-      height: 64,
-      frame: false,
-      transparent: true
+      width: 640,
+      height: 640
+      // frame: false,
+      // transparent: true
     });
 
     w.setMenu(null);
     w.loadURL(`file://${__dirname}/sprite_window.html`);
     //w.setIgnoreMouseEvents(true);
-    //w.webContents.openDevTools();
+    w.webContents.openDevTools();
     w.show();
     this.window = w;
     w.on("closed", () => {
@@ -32,7 +32,7 @@ class Sprite {
     });
   }
 
-  moveWindow(x = 0, y = 0) {
+  move(x = 0, y = 0) {
     if (!this.window) return;
 
     let pos = this.window.getPosition();
