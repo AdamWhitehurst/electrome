@@ -25,7 +25,7 @@ function createSprite() {
 
 app.on("ready", () => {
   createSprite();
-  createMainWindow();
+  //createMainWindow();
 });
 
 app.on("window-all-closed", () => {
