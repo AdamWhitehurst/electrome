@@ -1,0 +1,3 @@
+// {
+//   "include": ["node_modules/electron-prebuilt-compile/node_modules/electron"]
+// }

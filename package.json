@@ -11,6 +11,7 @@
   "author": "Adam Whitehurst",
   "license": "ISC",
   "devDependencies": {
+    "@types/pixi.js": "^4.8.6",
     "electron-prebuilt-compile": "^4.0.0"
   },
   "dependencies": {
