@@ -401,6 +401,7 @@
       "anchor": { "x": 0.5, "y": 0.5 }
     }
   },
+
   "animations": {
     "green_slime_idle": [
       "green_slime_idle_0.png",

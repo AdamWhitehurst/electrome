@@ -1,34 +1,43 @@
 import { ipcRenderer } from "electron";
 import "pixi.js";
-PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
-let dim = 64;
-let pixi = new PIXI.Application(dim, dim, { transparent: true });
+
+let pixi;
 let spriteName, currSprite;
 let animations;
-let defaultAction = {
-  mouseOver: () => {
-    playAnim("hop", {
-      loop: false,
-      onComplete: () => playAnim("idle", defaultAction)
-    });
-  }
-};
+
+function initPixiApp() {
+  if (pixi !== undefined) document.body.removeChild(pixi.view);
+
+  PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
+
+  pixi = new PIXI.Application(64, 64, { transparent: true });
+
+  let i = pixi.renderer.plugins.interaction;
+  i.on("pointerover", () => ipcPointerEvent("pointerover"));
+  i.on("pointerdown", () => ipcPointerEvent("pointerdown"));
+  i.on("pointerup", () => ipcPointerEvent("pointerup"));
+  i.on("pointerupoutside", () => ipcPointerEvent("pointerupoutside"));
+  i.on("mouspointerouteout", () => ipcPointerEvent("pointerout"));
+
+  document.body.appendChild(pixi.view);
+  loadSpritesheet();
+}
+
 function loadSpritesheet() {
   PIXI.loader
     .add("green_slime", "../../assets/sheets/green_slime.json")
-    .load(() => {
-      spriteName = ipcRenderer.sendSync("window-ready");
-      onSpritesheetLoaded();
-    });
+    .load(onSpritesheetLoaded);
 }
-function onSpritesheetLoaded() {
-  animations = PIXI.loader.resources[spriteName].spritesheet.animations;
-  playAnim("idle", defaultAction);
+
+function onSpritesheetLoaded(loader, resources) {
+  spriteName = ipcRenderer.sendSync("window-ready");
+  animations = resources[spriteName].spritesheet.animations;
 }
+
 function loadSprite(anim) {
-  console.log(anim);
   let as = new PIXI.extras.AnimatedSprite(animations[anim]);
-  as.interactive = true;
+  as.loop = false;
+  as.onComplete = () => ipcAnimEvent("complete");
   as.animationSpeed = 0.15;
   as.x = pixi.screen.width / 2;
   as.y = pixi.screen.height / 2;
@@ -38,27 +47,27 @@ function loadSprite(anim) {
 
   return as;
 }
-function playAnim(
-  animName,
-  { loop, onComplete, mouseOver, mouseUp, mouseDown }
-) {
+
+function playAnim(animName) {
   if (currSprite) {
     currSprite.stop();
     pixi.stage.removeChild(currSprite);
   }
   currSprite = loadSprite(`${spriteName}_${animName}`);
 
-  if (loop === false) {
-    currSprite.loop = false;
-  }
-  if (onComplete) {
-    currSprite.onComplete = onComplete;
-  }
-  if (mouseOver) {
-    currSprite.on("mouseover", mouseOver);
-  }
-
   pixi.stage.addChild(currSprite);
 }
-loadSpritesheet();
-document.body.appendChild(pixi.view);
+
+function ipcPointerEvent(event) {
+  ipcRenderer.send("pointer-event", event);
+}
+
+function ipcAnimEvent(event) {
+  ipcRenderer.send("anim-event", event);
+}
+
+ipcRenderer.on("new-state", (event, state) => {
+  playAnim(state);
+});
+
+initPixiApp();

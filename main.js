@@ -1,6 +1,6 @@
+import "electron-prebuilt-compile";
 import { app, BrowserWindow } from "electron";
 import Sprite from "./src/sprite/sprite";
-
 let mainWindow;
 let spritePool = [];
 function createMainWindow() {
@@ -8,7 +8,6 @@ function createMainWindow() {
     width: 800,
     height: 600
   });
-  //win.setIgnoreMouseEvents(true);
   mainWindow.setMenu(null);
   mainWindow.loadURL(`file://${__dirname}/src/main_window/main_window.html`);
   mainWindow.webContents.openDevTools();
@@ -16,6 +15,7 @@ function createMainWindow() {
     app.emit("window-all-closed");
     mainWindow = null;
   });
+
   mainWindow.show();
 }
 

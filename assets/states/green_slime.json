@@ -1,0 +1,15 @@
+{
+  "idle": {
+    "complete": { "idle": 90, "hop": 10 },
+    "pointerover": "squirt",
+    "pointerup": "squirt"
+  },
+  "squirt": {
+    "complete": "idle",
+    "pointerup": "hop"
+  },
+  "hop": {
+    "state-action": "move",
+    "complete": { "idle": 25, "hop": 75 }
+  }
+}

@@ -1,3 +1,11 @@
-// {
-//   "include": ["node_modules/electron-prebuilt-compile/node_modules/electron"]
-// }
+{
+  "compilerOptions": {
+    "outDir": "./built",
+    "allowJs": true,
+    "target": "es5"
+  },
+  "include": [
+    "./src/**/*",
+    "node_modules/electron-prebuilt-compile/node_modules/electron"
+  ]
+}
