@@ -1,6 +1,6 @@
 import "electron-prebuilt-compile";
 import { app, BrowserWindow } from "electron";
-import Sprite from "./src/sprite/sprite";
+import GreenSlime from "./src/green_slime/green_slime";
 let mainWindow;
 let spritePool = [];
 function createMainWindow() {
@@ -20,12 +20,12 @@ function createMainWindow() {
 }
 
 function createSprite() {
-  spritePool.push(new Sprite("green_slime"));
+  spritePool.push(new GreenSlime());
 }
 
 app.on("ready", () => {
   createSprite();
-  //createMainWindow();
+  // createMainWindow();
 });
 
 app.on("window-all-closed", () => {
